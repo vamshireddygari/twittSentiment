@@ -1,0 +1,22 @@
+@media (min-width: 768px) {
+    .sidebar-mini.sidebar-collapse .main-header .logo > .logo-mini {
+        font-size: 12px;
+    }
+}
+
+#map {
+    height: 500px;
+}
+
+#heatmap {
+    height: 500px;
+}
+
+.info-box-number {
+	font-size: 15px;
+}
+
+.make-scrollable {
+	height: 500px;
+	overflow: scroll;
+}

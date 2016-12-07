@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>TwittMap</title>
+
+    <div class="header-icon">
+    <img style="float:left" src="http://maps.google.com/mapfiles/ms/icons/green-dot.png"><span> Positive Sentiment </span></img>
+    <img style="float:center"  src="http://maps.google.com/mapfiles/ms/icons/red-dot.png"><span> Negative Sentiment </span></img>
+    <img src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"><span> Neutral Sentiment </span></img>
+    <div/>
+
+    <link rel="stylesheet" type="text/css" href="header-search.css">
+
+    <link href='http://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+    <style>
+        #map {
+            height: 750px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script>
+        var map;
+        var infowindow;
+        (function () {
+            google.maps.Map.prototype.markers = new Array();
+            google.maps.Map.prototype.addMarker = function (marker) {
+                this.markers[this.markers.length] = marker;
+            };
+            google.maps.Map.prototype.getMarkers = function () {
+                return this.markers
+            };
+            google.maps.Map.prototype.clearMarkers = function () {
+                if (infowindow) {
+                    infowindow.close();
+                }
+                for (var i = 0; i < this.markers.length; i++) {
+                    this.markers[i].set_map(null);
+                }
+            };
+        })();
+
+
+        function initialize() {
+            var mapOptions = {
+                zoom: 2,
+                center: {lat: 40.7127, lng: 74.0059},
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            };
+            map = new google.maps.Map(document.getElementById('map'),
+                mapOptions);
+
+            Notification.requestPermission();
+            
+            return map;
+        }
+
+
+        function displayNotification() {
+           if (Notification.permission == "granted") {
+               var data = {
+                   msg: "New Tweet has arrived"
+               };
+               var e = new Notification("Tweet Notification", {
+                   body: data.msg,
+                   icon: "https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png"
+               });
+               setTimeout(e.close.bind(e), 3000);
+           }
+       }
+
+
+        
+
+        function createMarker(twitter) {
+            var latLng = new google.maps.LatLng(twitter.latitude, twitter.longitude);
+            var sentiment = twitter.sentiment;
+            var user = twitter.username;
+            //var time = twitter.time;
+            var text = twitter.text;
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map
+            });
+
+            displayNotification();
+
+            if(sentiment == 'positive'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+            } else if(sentiment == 'neutral'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png')
+            } else if(sentiment == 'negative'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')   
+            }
+
+            
+
+            google.maps.event.addListener(marker, "click", function () {
+                if (infowindow)infowindow.close();
+                infowindow = new google.maps.InfoWindow({
+                    content: '<div id="bodyContent">' + '<a href="https://twitter.com/' + user + '">' + '<b>' + user + '</b></a>: '
+                    + text + '</p>' +
+                    '</div>'
+                });
+                infowindow.open(map, marker);
+            });
+            return marker;
+        }
+
+        function createMarkerOldTweets(twitter) {
+            var latLng = new google.maps.LatLng(twitter.latitude, twitter.longitude);
+            var sentiment = twitter.sentiment;
+            var user = twitter.username;
+            //var time = twitter.time;
+            var text = twitter.text;
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map
+            });
+
+            if(sentiment == 'positive'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+            } else if(sentiment == 'neutral'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png')
+            } else if(sentiment == 'negative'){
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')   
+            }
+
+            
+
+            google.maps.event.addListener(marker, "click", function () {
+                if (infowindow)infowindow.close();
+                infowindow = new google.maps.InfoWindow({
+                    content: '<div id="bodyContent">' + '<a href="https://twitter.com/' + user + '">' + '<b>' + user + '</b></a>: '
+                    + text + '</p>' +
+                    '</div>'
+                });
+                infowindow.open(map, marker);
+            });
+            return marker;
+        }
+        // Call the initialize function after the page has finished loading
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
+</head>
+
+<body>
+
+<header class="header-search">
+
+    <div class="header-limiter">
+
+        <h1><a href="#">Twitt<span>Map</span></a></h1>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <select id="combo">
+            <option searchKeyword="1">apple</option>
+            <option searchKeyword="2">google</option>
+            <option searchKeyword="3">fun</option>
+            <option searchKeyword="4">love</option>
+            <option searchKeyword="5">hate</option>
+            <option searchKeyword="6">nba</option>
+            <option searchKeyword="7">New York</option>
+            <option searchKeyword="8">donaldtrump</option>
+            <option searchKeyword="9">clinton</option>
+            <option searchKeyword="10">modi</option>
+            <option searchKeyword="11">manchesterunited</option>
+            
+
+        </select>
+        <input id="button1" type="button" value="Filter!"/>
+        <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+
+    </div>
+
+</header>
+
+<!-- The content of your page would go here. -->
+
+<div width="100%" id="map"></div>
+
+
+<script>
+//     var socket = io.connect();
+    var socket = io.connect();
+
+    $('#button1').click(function () {
+        var keyword = $('#combo').find(':selected').text();
+        var map = initialize();
+        socket.emit('my other event', {key: keyword});
+        
+    });
+
+    socket.on('toggle', function (newdata) {    //of the client in this case.
+            
+            
+            
+                
+                map.addMarker(createMarker(newdata));
+            
+        });
+
+    socket.on('oldtweets', function (newdata) {    //of the client in this case.
+            
+            
+            
+                console.log(newdata);
+                map.addMarker(createMarkerOldTweets(newdata));
+            
+        });
+
+
+
+</script>
+
+</body>
+
+</html>
